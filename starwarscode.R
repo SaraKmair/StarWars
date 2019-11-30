@@ -67,7 +67,8 @@ ggplot(top10, aes(reorder(character, +freq), y = freq)) +
   geom_col(fill = c("grey",  "grey","green", "grey", "grey", "red", "grey", "grey", "goldenrod2", "blue" ), col = "grey20") +
   coord_flip() +
   labs(x = "", y = "Frequency", title = "Top 10 characters") +
-  theme_economist()
+  theme_economist()+
+    geom_text(aes(label = freq, y = freq / 2))
 
 
 
@@ -81,7 +82,8 @@ ggplot(top4, aes(reorder(character, +freq), y = freq)) +
   geom_col(fill = c("grey",  "grey","grey", "red", "grey", "grey", "grey", "grey", "blue", "goldenrod2" ) , col = "grey20") +
   coord_flip() +
   labs(x = "", y = "Frequency", title = "A new hope top 10 characters") +
-  theme_economist()
+  theme_economist() +
+    geom_text(aes(label = freq, y = freq / 2))
 
 
 #The top ten character in episode 5
@@ -94,7 +96,8 @@ ggplot(top5, aes(reorder(character, +freq), y = freq)) +
   geom_col(fill = c("grey",  "grey","grey", "green", "red", "grey", "goldenrod2", "grey", "blue", "grey" ) , col = "grey20") +
   coord_flip() +
   labs(x = "", y = "Frequency", title = "The Empire Strikes Back top 10 characters") +
-  theme_economist()
+  theme_economist() +
+    geom_text(aes(label = freq, y = freq / 2))
 
 
 #The top ten character in episode 6
@@ -107,7 +110,8 @@ ggplot(top6, aes(reorder(character, +freq), y = freq)) +
   geom_col(fill = c("grey",  "grey","grey", "grey", "grey", "red", "grey","goldenrod2", "blue", "grey" ) , col = "grey20") +
   coord_flip() +
   labs(x = "", y = "Frequency", title = "Return of the Jedi top 10 characters ") +
-  theme_economist()
+  theme_economist() +
+    geom_text(aes(label = freq, y = freq / 2))
 
 #Extracting the dialogue attribute 
 dialogue <- starwars$dialogue
@@ -117,7 +121,7 @@ head(dialogue)
 dia.cor <- VCorpus(VectorSource(dialogue))
 dia.cor <- tm_map(dia.cor, content_transformer(tolower))
 dia.cor <- tm_map(dia.cor, removeWords, stopwords("english"))
-dia.cor <- tm_map(dia.cor, removeWords, c("sir", "master", "force"))
+dia.cor <- tm_map(dia.cor, removeWords, c("sir", "master", "force", "lord"))
 dia.cor <- tm_map(dia.cor, removePunctuation) #remove the punctuations
 
 dia.cor <- tm_map(dia.cor, stemDocument) #Stem words in a text document 
@@ -196,7 +200,8 @@ nrc.count <- tidy.starwars %>%
   count( word, sentiment, sort = T) %>%
   ungroup()
 
-#Top 10 used words based on the feeling  
+#Top 10 used words based on the feeling 
+#positive/negative 
 nrc.count %>%
   group_by(sentiment) %>%
   top_n(10) %>%
@@ -208,7 +213,7 @@ nrc.count %>%
   labs(x = "", y = "Top 10 positive vs negative words in the dialogue ") +
   coord_flip() +
   theme_economist()
-
+#other emotions 
 tidy.starwars %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = T, character) %>%
@@ -217,12 +222,12 @@ tidy.starwars %>%
   ggplot(aes(sentiment, n, fill = character))+
   geom_col(show.legend = FALSE) +
   facet_wrap(~character, scales = "free_y") +
-  labs(x = "", y = "Top 10 positive vs negative words in the dialogue ") +
+  labs(x = "", y = "") +
   coord_flip() +
   theme_economist()
 
 
-#looks like c3-po is the most trusting and positive character 
+#positive vs negative based on the character 
 tidy.starwars %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = T, character) %>%
@@ -234,7 +239,7 @@ tidy.starwars %>%
   coord_flip() +
   theme_economist()
 
-
+#other emotions based on the character 
 tidy.starwars %>%
   inner_join(get_sentiments("bing")) %>%
   count(word, sentiment, sort = T, character) %>%
@@ -247,17 +252,5 @@ tidy.starwars %>%
   theme_economist()
 
 
-
-#lexicon assigns words with a score that runs between -5 and 5, with negative scores indicating negative sentiment and positive scores indicating positive sentiment
-tidy.starwars %>%
-  inner_join(get_sentiments("afinn")) %>%
-  count(word, value, sort = T, character) %>%
-  mutate(n = reorder(value, n)) %>%
-  filter(character %in% c("LUKE","HAN","THREEPIO", "LEIA", "VADER")) %>%
-  ggplot(aes(character, n, fill = value)) +
-  geom_col(show.legend = T, position = "dodge") +
-  labs(x = "", y = "") +
-  coord_flip() +
-  scale_fill_manual(values = c("red", "grey", "seagreen3", "cyan3", "yellow", "purple"))
 
 
