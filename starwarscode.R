@@ -30,21 +30,31 @@ str(eps5)
 
 str(eps6)
 
-
-#eps6 has the highest number of characteres 60
-
-
-starwars <- rbind(eps4, eps5, eps6)
-str(starwars)
-
-
 #changing dialogue data type to character 
-starwars$dialogue <- as.character(starwars$dialogue)
+
 eps4$dialogue <- as.character(eps4$dialogue)
 eps5$dialogue <- as.character(eps5$dialogue)
 eps6$dialogue <- as.character(eps6$dialogue)
+```
 
 
+#Replacing character Threepio with C-3PO  
+levels(eps4$character) <- c(levels(eps4$character), "C-3PO")
+eps4[which(eps4$character == "THREEPIO"), ] <-  as.factor("C-3PO")
+
+levels(eps5$character) <- c(levels(eps5$character), "C-3PO")
+eps5[which(eps5$character == "THREEPIO"), ] <-  as.factor("C-3PO")
+
+levels(eps6$character) <- c(levels(eps6$character), "C-3PO")
+eps6[which(eps6$character == "THREEPIO"), ] <-  as.factor("C-3PO")
+
+
+
+#eps6 has the highest number of characteres 60
+
+starwars <- rbind(eps4, eps5, eps6)
+str(starwars)
+```
 
 
 #The top ten character with highest count of scenes in all episodes 
@@ -54,9 +64,10 @@ top10 <- starwars %>%
   arrange(desc(freq)) %>% 
   slice(1:10)  #order the first 10 in descinding order 
 ggplot(top10, aes(reorder(character, +freq), y = freq)) +
-  geom_col(fill = "goldenrod2" , col = "grey20") +
+  geom_col(fill = c("grey",  "grey","green", "grey", "grey", "red", "grey", "grey", "goldenrod2", "blue" ), col = "grey20") +
   coord_flip() +
-  labs(x = "", y = "Frequency", title = "Top 10 characters") 
+  labs(x = "", y = "Frequency", title = "Top 10 characters") +
+  theme_economist()
 
 
 
@@ -67,10 +78,10 @@ top4 <- eps4 %>%
   arrange(desc(freq)) %>% 
   slice(1:10)  #order the first 10 in descinding order 
 ggplot(top4, aes(reorder(character, +freq), y = freq)) +
-  geom_col(fill = "goldenrod2" , col = "grey20") +
+  geom_col(fill = c("grey",  "grey","grey", "red", "grey", "grey", "grey", "grey", "blue", "goldenrod2" ) , col = "grey20") +
   coord_flip() +
-  labs(x = "", y = "Frequency", title = "A new hope top 10 characters")
-
+  labs(x = "", y = "Frequency", title = "A new hope top 10 characters") +
+  theme_economist()
 
 
 #The top ten character in episode 5
@@ -80,9 +91,10 @@ top5 <- eps5 %>%
   arrange(desc(freq)) %>% 
   slice(1:10)  #order the first 10 in descinding order 
 ggplot(top5, aes(reorder(character, +freq), y = freq)) +
-  geom_col(fill = "goldenrod2" , col = "grey20") +
+  geom_col(fill = c("grey",  "grey","grey", "green", "red", "grey", "goldenrod2", "grey", "blue", "grey" ) , col = "grey20") +
   coord_flip() +
-  labs(x = "", y = "Frequency", title = "The Empire Strikes Back top 10 characters")
+  labs(x = "", y = "Frequency", title = "The Empire Strikes Back top 10 characters") +
+  theme_economist()
 
 
 #The top ten character in episode 6
@@ -92,11 +104,10 @@ top6 <- eps6 %>%
   arrange(desc(freq)) %>% 
   slice(1:10)  #order the first 10 in descinding order 
 ggplot(top6, aes(reorder(character, +freq), y = freq)) +
-  geom_col(fill = "goldenrod2" , col = "grey20") +
+  geom_col(fill = c("grey",  "grey","grey", "grey", "grey", "red", "grey","goldenrod2", "blue", "grey" ) , col = "grey20") +
   coord_flip() +
-  labs(x = "", y = "Frequency", title = "Return of the Jedi top 10 characters ")
-
-
+  labs(x = "", y = "Frequency", title = "Return of the Jedi top 10 characters ") +
+  theme_economist()
 
 #Extracting the dialogue attribute 
 dialogue <- starwars$dialogue
@@ -116,16 +127,12 @@ dia.cor <- tm_map(dia.cor, stripWhitespace)#remove white spaces at the beginning
 
 head(dia.cor)
 
-
-
 #putting all our data in a matrix  
 #and count how many times the word occure in each document 
 td.mat <- TermDocumentMatrix(dia.cor)
 
 #converting from term document matrix to matrix 
 td.mat <- as.matrix(td.mat)
-
-
 
 
 #finding the total frequency of a word
@@ -148,17 +155,11 @@ wordcloud(wc.df$word, wc.df$count, max.words=100, random.order=FALSE, rot.per=0.
           colors=brewer.pal(8, "Dark2"))
 
 
-
-
-
 #converting to data frame word count 
 wordcount.df <- as.data.frame(wordcount)
 
-
-
 #saving star wars file 
 file <- write.table(starwars, file = "starwars.txt")
-
 
 
 #unnest_tokens Split a column into tokens using the tokenizers package, splitting the table into one-token-per-row.
@@ -169,12 +170,11 @@ tidy.starwars <- starwars %>%
 
 
 
-
-
 #after tokenizing it's time to count the words in the dialogue and get the sentiments of the words either they are negative or positive words (using bing)
 bing.count <- tidy.starwars %>%
   inner_join(get_sentiments("bing")) %>%
   count( word, sentiment, sort = T) 
+
 
 #Top 10 positive vs negative words in the dialogue 
 bing.count %>%
@@ -190,15 +190,11 @@ bing.count %>%
   coord_flip() +
   theme_economist()
 
-
-```{r}
 #after tokenizing it's time to count the words in the dialogue and get the sentiments of the words either they are negative or positive  or other feelings (using nrc)
 nrc.count <- tidy.starwars %>%
   inner_join(get_sentiments("nrc")) %>%
   count( word, sentiment, sort = T) %>%
   ungroup()
-
-
 
 #Top 10 used words based on the feeling  
 nrc.count %>%
@@ -213,7 +209,6 @@ nrc.count %>%
   coord_flip() +
   theme_economist()
 
-
 tidy.starwars %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = T, character) %>%
@@ -227,7 +222,7 @@ tidy.starwars %>%
   theme_economist()
 
 
-#looks like c-3po is the most trusting and positive character 
+#looks like c3-po is the most trusting and positive character 
 tidy.starwars %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = T, character) %>%
@@ -253,5 +248,16 @@ tidy.starwars %>%
 
 
 
+#lexicon assigns words with a score that runs between -5 and 5, with negative scores indicating negative sentiment and positive scores indicating positive sentiment
+tidy.starwars %>%
+  inner_join(get_sentiments("afinn")) %>%
+  count(word, value, sort = T, character) %>%
+  mutate(n = reorder(value, n)) %>%
+  filter(character %in% c("LUKE","HAN","THREEPIO", "LEIA", "VADER")) %>%
+  ggplot(aes(character, n, fill = value)) +
+  geom_col(show.legend = T, position = "dodge") +
+  labs(x = "", y = "") +
+  coord_flip() +
+  scale_fill_manual(values = c("red", "grey", "seagreen3", "cyan3", "yellow", "purple"))
 
 
