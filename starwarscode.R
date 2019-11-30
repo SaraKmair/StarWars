@@ -40,13 +40,13 @@ eps6$dialogue <- as.character(eps6$dialogue)
 
 #Replacing character Threepio with C-3PO  
 levels(eps4$character) <- c(levels(eps4$character), "C-3PO")
-eps4[which(eps4$character == "THREEPIO"), ] <-  as.factor("C-3PO")
+eps4$character[which(eps4$character == "THREEPIO")] <-  as.factor("C-3PO")
 
 levels(eps5$character) <- c(levels(eps5$character), "C-3PO")
-eps5[which(eps5$character == "THREEPIO"), ] <-  as.factor("C-3PO")
+eps5$character[which(eps5$character == "THREEPIO")] <-  as.factor("C-3PO")
 
 levels(eps6$character) <- c(levels(eps6$character), "C-3PO")
-eps6[which(eps6$character == "THREEPIO"), ] <-  as.factor("C-3PO")
+eps6$character[which(eps6$character == "THREEPIO")] <-  as.factor("C-3PO")
 
 
 
